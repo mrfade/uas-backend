@@ -15,22 +15,17 @@ Project structure:
 .
 ├── README.md
 ├── app.py
-├── endpoints
-│   ├── __init__.py
-│   ├── todos
-│   │   ├── __init__.py
-│   │   ├── model.py
-│   │   └── resource.py
-│   └── users
-│       ├── __init__.py
-│       ├── model.py
-│       └── resource.py
+├── controllers
+│   └── __init__.py
+├── models
+│   └── __init__.py
 ├── manage.py
 ├── requirements.txt
 └── settings.py
 ```
 
-* endpoints - holds all endpoints.
+* conrollers - holds all resources.
+* models - holds all models.
 * app.py - flask application initialization.
 * settings.py - all global app settings.
 * manage.py - script for managing application (migrations, server execution, etc.)
@@ -38,7 +33,7 @@ Project structure:
 ## Running 
 
 1. Clone repository.
-2. pip install requirements.txt
+2. pip install -r requirements.txt
 3. Run following commands:
     1. python manage.py db init
     2. python manage.py db migrate
