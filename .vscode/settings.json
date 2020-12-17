@@ -1,0 +1,9 @@
+{
+    "python.pythonPath": "C:\\Users\\Enes\\AppData\\Local\\Programs\\Python\\Python36\\python.exe",
+    "python.linting.pylintArgs": [
+        "--load-plugins",
+        "pylint_flask_sqlalchemy",
+        "pylint_flask",
+    ],
+    "python.formatting.provider": "none"
+}
