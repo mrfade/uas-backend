@@ -22,14 +22,20 @@ for ex in default_exceptions:
 app.config['SQLALCHEMY_DATABASE_URI'] = settings.SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = settings.SQLALCHEMY_TRACK_MODIFICATIONS
 app.config['BUNDLE_ERRORS'] = settings.BUNDLE_ERRORS
+app.config['SECRET_KEY'] = settings.SECRET_KEY
 
 db = SQLAlchemy(app)
 api = Api(app)
 api.prefix = '/api'
 
-from controllers.users import UsersResource
+from controllers.auth import LoginResource, RegisterResource
+from controllers.environments import EnvironmentsResource
+from controllers.appointments import AppointmentsResource
 
-api.add_resource(UsersResource, '/users', '/users/<int:user_id>')
+api.add_resource(LoginResource, '/auth/login')
+api.add_resource(RegisterResource, '/auth/register')
+api.add_resource(EnvironmentsResource, '/environments', '/environments/<int:environment_id>')
+api.add_resource(AppointmentsResource, '/appointments', '/appointments/<int:appointment_id>')
 
 if __name__ == '__main__':
     app.run()
