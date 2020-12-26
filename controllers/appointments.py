@@ -1,6 +1,7 @@
 from flask_restful import Resource, reqparse, request
 from flask_restful import fields, marshal_with, marshal, inputs
 from models.appointments import Appointment
+from models.environments import EnvironmentWorkingHour
 from utils.jwt import authenticated
 from utils.dateformat import DateTimeFormat
 from app import db
@@ -21,7 +22,7 @@ appointment_list_fields = {
 
 appointment_post_parser = reqparse.RequestParser()
 appointment_post_parser.add_argument(
-    'environment_id', type=inputs.regex('^\d+$'), required=True, location=['json'], help='environment_id parameter is required')
+    'environment_id', type=inputs.positive, required=True, location=['json'], help='environment_id parameter is required')
 appointment_post_parser.add_argument(
     'start_date', type=inputs.datetime_from_iso8601, required=True, location=['json'], help='start_date parameter is required')
 appointment_post_parser.add_argument(
@@ -61,18 +62,35 @@ class AppointmentsResource(Resource):
 
     def post(self, user=None):
         args = appointment_post_parser.parse_args()
-
+        
         user_id = user.id
         start_date = args.start_date
         end_date = args.end_date
-
+        environment_id=args.environment_id
+        environmentworkinghour = EnvironmentWorkingHour.query.filter_by(environment_id=environment_id).all()
+        appointments = Appointment.query.filter_by(environment_id=environment_id).all()
+        
         # kontroller
+        if(end_date < start_date):
+             return {
+                    'status': 'error',
+                    'message': 'bitiş saati başlangıç saatinden küçük olamaz'
+                }, 400
 
-        return {
-            'status': 'error',
-            'message': 'çakışma var'
-        }, 400
+        for working_hours in environmentworkinghour:
+            if(start_date < working_hours.start or start_date > working_hours.end or end_date < working_hours.start or end_date > working_hours.end ):
+                return {
+                    'status': 'error',
+                    'message': 'çalışma saatleri içinde değil'
+                }, 400
+        for a in appointments:
+            if ( (a.start <= start_date and start_date < a.end) or (a.start < end_date and end_date <= a.end) or (start_date >= a.start and end_date <= a.end)or(start_date<a.start and end_date>a.end)):
+                return {
+                    'status': 'error',
+                    'message': 'bu saat aralığında randevu alınmıştır'
+                }, 400
 
+        
         ## eğer kontroller eklemeye uygunsa bu kod çalışacak
         # appointment = Appointment(
         #     start=start_date, end=end_date, description=args.description, environment_id=args.environment_id, user_id=user_id)
