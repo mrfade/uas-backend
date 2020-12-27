@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import HTTPException
@@ -6,7 +7,7 @@ from werkzeug.exceptions import default_exceptions
 import settings
 
 app = Flask(__name__)
-
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 @app.errorhandler(Exception)
 def handle_error(e):
@@ -29,11 +30,13 @@ api = Api(app)
 api.prefix = '/api'
 
 from controllers.auth import LoginResource, RegisterResource
+from controllers.users import MeResource
 from controllers.environments import EnvironmentsResource
 from controllers.appointments import AppointmentsResource
 
 api.add_resource(LoginResource, '/auth/login')
 api.add_resource(RegisterResource, '/auth/register')
+api.add_resource(MeResource, '/users/me')
 api.add_resource(EnvironmentsResource, '/environments', '/environments/<int:environment_id>')
 api.add_resource(AppointmentsResource, '/appointments', '/appointments/<int:appointment_id>')
 
