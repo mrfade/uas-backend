@@ -62,3 +62,52 @@ def authenticated(func):
             }, 401
 
     return wrapper
+
+
+def adminAuthenticated(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if not getattr(func, 'adminAuthenticated', True):
+            return func(*args, **kwargs)
+
+        try:
+            token_passed = (request.headers['Authorization'].split(' '))[1]
+        except KeyError:
+            token_passed = None
+
+        if token_passed is not None:
+            try:
+                data = jwt.decode(token_passed, settings.SECRET_KEY, algorithms=['HS256'])
+
+                admin = Admin.query.filter_by(id=data['id']).first()
+                if admin:
+                    return func(admin=admin, *args, **kwargs)
+
+                abort(401)
+            except jwt.exceptions.ExpiredSignatureError:
+                return {
+                    'status': 'error',
+                    'message': 'Token has expired'
+                }, 403
+            except (
+                jwt.exceptions.InvalidTokenError,
+                jwt.exceptions.DecodeError,
+                jwt.exceptions.InvalidAudienceError,
+                jwt.exceptions.InvalidIssuerError,
+                jwt.exceptions.InvalidIssuedAtError,
+                jwt.exceptions.ImmatureSignatureError,
+                jwt.exceptions.InvalidKeyError,
+                jwt.exceptions.InvalidAlgorithmError,
+                jwt.exceptions.MissingRequiredClaimError
+            ):
+                return {
+                    'status': 'error',
+                    'message': 'Invalid Token'
+                }, 401
+        else:
+            return {
+                'status': 'error',
+                'message': 'Token required'
+            }, 401
+
+    return wrapper
