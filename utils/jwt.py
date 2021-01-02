@@ -4,7 +4,7 @@ import datetime
 from functools import wraps
 from flask_restful import abort, request
 from models.users import User
-from models.admin import Admin
+from models.admins import Admin
 from utils.password import check_encrypted_password
 
 
