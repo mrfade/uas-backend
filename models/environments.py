@@ -12,6 +12,7 @@ class Environment(db.Model):
     __tablename__ = 'environment'
 
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100, collation='utf8_general_ci'), nullable=False)
     location = db.Column(db.String(100, collation='utf8_general_ci'), nullable=False)
     capacity = db.Column(db.Integer, nullable=False)
     type = db.Column(db.String(50, collation='utf8_general_ci'), nullable=False)
