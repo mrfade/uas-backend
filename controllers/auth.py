@@ -44,7 +44,7 @@ class LoginResource(Resource):
             if check_encrypted_password(password, user.password):
                 return {
                     'status': 'success',
-                    'access_token': encode_jwt(user.id)
+                    'access_token': encode_jwt(user_id=user.id)
                 }
         except:
             return {

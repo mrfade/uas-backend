@@ -30,7 +30,7 @@ def authenticated(func):
             try:
                 data = jwt.decode(token_passed, settings.SECRET_KEY, algorithms=['HS256'])
 
-                user = User.query.filter_by(id=data['id']).first()
+                user = User.query.filter_by(id=data['user_id']).first()
                 if user:
                     return func(user=user, *args, **kwargs)
 
@@ -79,7 +79,7 @@ def adminAuthenticated(func):
             try:
                 data = jwt.decode(token_passed, settings.SECRET_KEY, algorithms=['HS256'])
 
-                admin = Admin.query.filter_by(id=data['id']).first()
+                admin = Admin.query.filter_by(id=data['admin_id']).first()
                 if admin:
                     return func(admin=admin, *args, **kwargs)
 
