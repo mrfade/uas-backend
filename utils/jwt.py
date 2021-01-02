@@ -7,9 +7,9 @@ from models.users import User
 from utils.password import check_encrypted_password
 
 
-def encode_jwt(_id):
+def encode_jwt(**kwargs):
     payload = {
-        'id': _id,
+        **kwargs,
         'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=3131)
     }
     return jwt.encode(payload, settings.SECRET_KEY).decode('utf-8')
