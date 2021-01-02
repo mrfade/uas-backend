@@ -29,6 +29,12 @@ db = SQLAlchemy(app)
 api = Api(app)
 api.prefix = '/api'
 
+from models.admins import Admin
+from models.appointments import Appointment
+from models.environments import Environment, EnvironmentAdmin, EnvironmentWorkingHour
+from models.fixtures import Fixture
+from models.users import User, UserStudent, UserStaff
+
 from controllers.auth import LoginResource, RegisterResource
 from controllers.users import MeResource
 from controllers.environments import EnvironmentsResource
