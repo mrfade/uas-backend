@@ -35,15 +35,27 @@ from models.environments import Environment, EnvironmentAdmin, EnvironmentWorkin
 from models.fixtures import Fixture
 from models.users import User, UserStudent, UserStaff
 
+from controllers.admin.auth import AdminAuthLoginResource, AdminAuthRegisterResource
 from controllers.auth import LoginResource, RegisterResource
 from controllers.users import MeResource
 from controllers.environments import EnvironmentsResource
 from controllers.appointments import AppointmentsResource
 
+# admin
+api.add_resource(AdminAuthLoginResource, '/admin/auth/login')
+api.add_resource(AdminAuthRegisterResource, '/admin/auth/register')
+
+# auth
 api.add_resource(LoginResource, '/auth/login')
 api.add_resource(RegisterResource, '/auth/register')
+
+# users
 api.add_resource(MeResource, '/users/me')
+
+# environments
 api.add_resource(EnvironmentsResource, '/environments', '/environments/<int:environment_id>')
+
+# appointments
 api.add_resource(AppointmentsResource, '/appointments', '/appointments/<int:appointment_id>')
 
 if __name__ == '__main__':
