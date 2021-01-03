@@ -54,6 +54,10 @@ class AdminFixturesResource(Resource):
 
             fixture = fixture.all()
 
+            fixture = Fixture(**args)
+            db.session.add(fixture)
+            db.session.commit()
+
             return marshal({
                 'count': len(fixture),
                 'fixtures': [marshal(f, admin_fixture_fields) for f in fixture]
