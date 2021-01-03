@@ -12,13 +12,14 @@ admin_appointment_fields = {
     'start': DateTimeFormat,
     'end': DateTimeFormat,
     'description': fields.String,
+    'user_id': fields.Integer,
     'environment_id': fields.Integer,
     'is_accepted' : fields.Boolean,
 }
 
 admin_appointment_list_fields = {
     'count': fields.Integer,
-    'appointments': fields.List(fields.Nested(appointment_fields)),
+    'appointments': fields.List(fields.Nested(admin_appointment_fields)),
 }
 
 admin_appointment_post_parser = reqparse.RequestParser()
@@ -30,13 +31,12 @@ admin_appointment_post_parser.add_argument(
     'end_date', type=inputs.datetime_from_iso8601, required=True, location=['json'], help='end_date parameter is required')
 admin_appointment_post_parser.add_argument(
     'description', type=inputs.regex('^\w{,1000}$'), required=True, location=['json'], help='description parameter is required')
-admin_appointment_post_parser.add_argument(
-    'is_accepted', type=inputs.boolean,location=['json'], help='is_accepted parameter is assigned as default value')
+
 
 class AdminAppointmentsResource(Resource):
     method_decorators = [adminAuthenticated]
 
-    def get(self, appointment_id=None, admin=None ):
+    def get(self, appointment_id=None, admin=None):
         if appointment_id:
             appointment = Appointment.query.filter_by(id=appointment_id, admin_id=admin.id).first()
             return marshal(appointment, admin_appointment_fields)
@@ -62,6 +62,14 @@ class AdminAppointmentsResource(Resource):
                 'appointments': [marshal(a, admin_appointment_fields) for a in appointments]
             }, admin_appointment_list_fields)
 
-def approveAppointment(self, appointment_id):
-    appointment = Appointment.query.filter_by(appointment_id=self.appointment_id).first()
-    appointment.is_accepted = True
+
+class AdminAppointmentApproveResource(Resource):
+    method_decorators = [adminAuthenticated]
+
+    def put(self, appointment_id=None, admin=None):
+        appointment = Appointment.query.filter_by(id=appointment_id, admin_id=admin.id).first_or_404()
+        
+        appointment.is_accepted = True
+        db.session.commit()
+        
+        return marshal(appointment, admin_appointment_fields)

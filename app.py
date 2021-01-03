@@ -36,6 +36,9 @@ from models.fixtures import Fixture
 from models.users import User, UserStudent, UserStaff
 
 from controllers.admin.auth import AdminAuthLoginResource, AdminAuthRegisterResource
+from controllers.admin.environments import AdminEnvironmentsResource, AdminEnvironmentWorkingHoursResource
+from controllers.admin.fixtures import AdminFixturesResource
+from controllers.admin.appointments import AdminAppointmentsResource, AdminAppointmentApproveResource
 from controllers.auth import LoginResource, RegisterResource
 from controllers.users import MeResource
 from controllers.environments import EnvironmentsResource
@@ -44,6 +47,11 @@ from controllers.appointments import AppointmentsResource
 # admin
 api.add_resource(AdminAuthLoginResource, '/admin/auth/login')
 api.add_resource(AdminAuthRegisterResource, '/admin/auth/register')
+api.add_resource(AdminEnvironmentsResource, '/admin/environments', '/admin/environments/<int:environment_id>')
+api.add_resource(AdminFixturesResource, '/admin/fixtures', '/admin/fixtures/<int:fixture_id>')
+api.add_resource(AdminEnvironmentWorkingHoursResource, '/admin/working_hours')
+api.add_resource(AdminAppointmentsResource, '/admin/appointments', '/admin/appointments/<int:appointment_id>')
+api.add_resource(AdminAppointmentApproveResource, '/admin/appointments/<int:appointment_id>/approve')
 
 # auth
 api.add_resource(LoginResource, '/auth/login')

@@ -11,7 +11,8 @@ admin_fixture_fields = {
     'name': fields.String,
     'type': fields.String,
     'size': fields.String,
-    'description': fields.String
+    'description': fields.String,
+    'environment_id': fields.Integer
 }
 
 admin_fixture_list_fields = {
@@ -20,6 +21,8 @@ admin_fixture_list_fields = {
 }
 
 admin_fixture_post_parser = reqparse.RequestParser()
+admin_fixture_post_parser.add_argument(
+    'environment_id', type=inputs.positive, required=True, location=['json'], help='environment_id parameter is required')
 admin_fixture_post_parser.add_argument(
     'name', type=inputs.regex('^\w{,100}$'), required=True, location=['json'], help='name parameter is required')
 admin_fixture_post_parser.add_argument(
@@ -54,11 +57,18 @@ class AdminFixturesResource(Resource):
 
             fixture = fixture.all()
 
-            fixture = Fixture(**args)
-            db.session.add(fixture)
-            db.session.commit()
-
             return marshal({
                 'count': len(fixture),
                 'fixtures': [marshal(f, admin_fixture_fields) for f in fixture]
             }, admin_fixture_list_fields)
+
+    @marshal_with(admin_fixture_fields)
+    def post(self):
+        args = admin_fixture_post_parser.parse_args()
+
+        fixture = Fixture(**args)
+        db.session.add(fixture)
+        db.session.commit()
+
+        return fixture
+

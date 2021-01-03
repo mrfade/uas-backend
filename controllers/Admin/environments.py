@@ -1,10 +1,16 @@
 from flask_restful import Resource, reqparse, request
 from flask_restful import fields, marshal_with, marshal, inputs
-from models.environments import Environment
+from models.environments import Environment, EnvironmentWorkingHour, EnvironmentAdmin
 from models.fixtures import Fixture
 from utils.jwt import adminAuthenticated
 from utils.dateformat import DateTimeFormat
 from app import db
+
+working_hour_fields = {
+    'id': fields.Integer,
+    'start': DateTimeFormat,
+    'end': DateTimeFormat
+}
 
 admin_environment_fields = {
     'id': fields.Integer,
@@ -18,11 +24,7 @@ admin_environment_fields = {
         'size': fields.String,
         'description': fields.String
     })),
-    'working_hours': fields.List(fields.Nested({
-        'id': fields.Integer,
-        'start': DateTimeFormat,
-        'end': DateTimeFormat
-    })),
+    'working_hours': fields.List(fields.Nested(working_hour_fields)),
 }
 
 admin_environments_list_fields = {
@@ -40,6 +42,13 @@ admin_environment_post_parser.add_argument(
 admin_environment_post_parser.add_argument(
     'type', type=inputs.regex('\w{,50}^$'), required=True, location=['json'], help='type parameter is required')
 
+working_hour_post_parser = reqparse.RequestParser()
+working_hour_post_parser.add_argument(
+    'environment_id', type=inputs.positive, required=True, location=['json'], help='environment_id parameter is required')
+working_hour_post_parser.add_argument(
+    'start', type=inputs.datetime_from_iso8601, required=True, location=['json'], help='start parameter is required')
+working_hour_post_parser.add_argument(
+    'end', type=inputs.datetime_from_iso8601, required=True, location=['json'], help='end parameter is required')
 
 class AdminEnvironmentsResource(Resource):
     method_decorators = [adminAuthenticated]
@@ -73,3 +82,33 @@ class AdminEnvironmentsResource(Resource):
                 'count': len(environment),
                 'environments': [marshal(e, admin_environment_fields) for e in environment]
             }, admin_environments_list_fields)
+
+    @marshal_with(admin_environment_fields)
+    def post(self, admin=None):
+        args = admin_environment_post_parser.parse_args()
+
+        environment = Environment(**args)
+        db.session.add(environment)
+        db.session.commit()
+
+        environment_admin = EnvironmentAdmin(environment_id=environment.id, admin_id=admin.id)
+        db.session.add(environment_admin)
+        db.session.commit()
+
+        return environment
+
+
+class AdminEnvironmentWorkingHoursResource(Resource):
+    method_decorators = [adminAuthenticated]
+
+    @marshal_with(working_hour_fields)
+    def post(self, admin=None):
+        args = working_hour_post_parser.parse_args()
+
+        environment = Environment.query.filter_by(id=args.environment_id, admin_id=admin.id).first_or_404()
+
+        working_hour = EnvironmentWorkingHour(**args)
+        db.session.add(working_hour)
+        db.session.commit()
+
+        return working_hour
