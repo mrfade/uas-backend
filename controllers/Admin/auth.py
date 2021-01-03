@@ -67,19 +67,4 @@ class AdminAuthRegisterResource(Resource):
             'status': 'success',
             'message': 'Register successfull'
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
+  
