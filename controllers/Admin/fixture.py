@@ -8,28 +8,18 @@ from app import db
 
 admin_fixture_fields = {
     'id': fields.Integer,
-    'location': fields.String,
-    'capacity': fields.Integer,
+    'name': fields.String,
     'type': fields.String,
-    'fixtures': fields.List(fields.Nested({
-        'id': fields.Integer,
-        'name': fields.String,
-        'type': fields.String,
-        'size': fields.String,
-        'description': fields.String
-    })),
-    'working_hours': fields.List(fields.Nested({
-        'id': fields.Integer,
-        'start': DateTimeFormat,
-        'end': DateTimeFormat
-    })),
+    'size': fields.String,
+    'description': fields.String
 }
 
 admin_fixture_list_fields = {
     'count': fields.Integer,
-    'environments': fields.List(fields.Nested(admin_fixture_fields)),
+    'fixtures': fields.List(fields.Nested(admin_fixture_fields)),
 }
 
+admin_fixture_post_parser = reqparse.RequestParser()
 admin_fixture_post_parser.add_argument(
     'name', type=inputs.regex('^\w{,100}$'), required=True, location=['json'], help='name parameter is required')
 admin_fixture_post_parser.add_argument(
@@ -45,7 +35,7 @@ class AdminFixturesResource(Resource):
 
     def get(self, fixture_id=None, admin=None):
         if fixture_id:
-            fixture = Fixture.query.filter_by(id=fixture_id, admin_id=admin.id).first()
+            fixture = Fixture.query.filter_by(id=fixture_id).first_or_404()
             return marshal(fixture, admin_fixture_fields)
         else:
             args = request.args.to_dict()
