@@ -30,7 +30,7 @@ admin_environments_list_fields = {
     'environments': fields.List(fields.Nested(admin_environment_fields)),
 }
 
-
+admin_environment_post_parser = reqparse.RequestParser()
 admin_environment_post_parser.add_argument(
     'name', type=inputs.regex('^\w{,100}$'), required=True, location=['json'], help='name parameter is required')
 admin_environment_post_parser.add_argument(
@@ -39,7 +39,6 @@ admin_environment_post_parser.add_argument(
     'capacity', type=inputs.positive, required=True, location=['json'], help='capacity parameter is required')
 admin_environment_post_parser.add_argument(
     'type', type=inputs.regex('\w{,50}^$'), required=True, location=['json'], help='type parameter is required')
-
 
 
 class AdminEnvironmentsResource(Resource):
@@ -70,4 +69,3 @@ class AdminEnvironmentsResource(Resource):
                 'count': len(environment),
                 'environments': [marshal(e, admin_environment_fields) for e in environment]
             }, admin_environments_list_fields)
-
