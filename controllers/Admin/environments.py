@@ -65,6 +65,10 @@ class AdminEnvironmentsResource(Resource):
 
             environment = environment.all()
 
+            environment = Environment(**args)
+            db.session.add(environment)
+            db.session.commit()
+
             return marshal({
                 'count': len(environment),
                 'environments': [marshal(e, admin_environment_fields) for e in environment]

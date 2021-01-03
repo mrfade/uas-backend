@@ -13,6 +13,7 @@ appointment_fields = {
     'end': DateTimeFormat,
     'description': fields.String,
     'environment_id': fields.Integer,
+    'is_accepted' : fields.Boolean,
 }
 
 appointment_list_fields = {
@@ -29,6 +30,8 @@ appointment_post_parser.add_argument(
     'end_date', type=inputs.datetime_from_iso8601, required=True, location=['json'], help='end_date parameter is required')
 appointment_post_parser.add_argument(
     'description', type=inputs.regex('^\w{,1000}$'), required=True, location=['json'], help='description parameter is required')
+appointment_post_parser.add_argument(
+    'is_accepted', type=inputs.boolean,location=['json'], help='is_accepted parameter is assigned as default value')
 
 
 class AppointmentsResource(Resource):
@@ -57,7 +60,7 @@ class AppointmentsResource(Resource):
 
             return marshal({
                 'count': len(appointments),
-                'appointments': [marshal(e, appointment_fields) for e in appointments]
+                'appointments': [marshal(a, appointment_fields) for a in appointments]
             }, appointment_list_fields)
 
     def post(self, user=None):
@@ -70,7 +73,6 @@ class AppointmentsResource(Resource):
         environmentworkinghour = EnvironmentWorkingHour.query.filter_by(environment_id=environment_id).all()
         appointments = Appointment.query.filter_by(environment_id=environment_id).all()
         
-        # kontroller
         if(end_date < start_date):
              return {
                     'status': 'error',
@@ -90,12 +92,11 @@ class AppointmentsResource(Resource):
                     'message': 'bu saat aralığında randevu alınmıştır'
                 }, 400
 
+        appointment = Appointment( start=start_date, end=end_date, description=args.description, environment_id=args.environment_id, user_id=user_id, is_accepted =args.is_accepted)
+        db.session.add(appointment)
+        db.session.commit()
         
-        ## eğer kontroller eklemeye uygunsa bu kod çalışacak
-        # appointment = Appointment(
-        #     start=start_date, end=end_date, description=args.description, environment_id=args.environment_id, user_id=user_id)
-        # db.session.add(appointment)
-        # db.session.commit()
-
-        # return marshal(appointment, appointment_fields)
-
+        return marshal({
+                'count': len(appointment),
+                'appointments': [marshal(a,appointment_fields) for a in appointments]
+            }, appointment_list_fields)
