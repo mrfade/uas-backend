@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse, request
 from flask_restful import fields, marshal_with, marshal, inputs
 from models.appointments import Appointment
-from models.environments import EnvironmentWorkingHour
+from models.environments import EnvironmentWorkingHour, EnvironmentAdmin, Environment
 from utils.jwt import adminAuthenticated
 from utils.dateformat import DateTimeFormat
 from app import db
@@ -36,9 +36,10 @@ admin_appointment_post_parser.add_argument(
 class AdminAppointmentsResource(Resource):
     method_decorators = [adminAuthenticated]
 
-    def get(self, appointment_id=None, admin=None):
+    def get(self, appointment_id=None, admin=None):   
         if appointment_id:
-            appointment = Appointment.query.filter_by(id=appointment_id, admin_id=admin.id).first()
+            appointment = Appointment.query.filter_by(id=appointment_id).first_or_404()
+            environment_admin = EnvironmentAdmin.query.filter_by(environment_id=appointment.environment_id,admin_id=admin.id).first_or_404()
             return marshal(appointment, admin_appointment_fields)
         else:
             args = request.args.to_dict()
@@ -48,7 +49,7 @@ class AdminAppointmentsResource(Resource):
             args.pop('limit', None)
             args.pop('offset', None)
 
-            appointments = Appointment.query.filter_by(**args, admin_id=admin.id).order_by(Appointment.id)
+            appointments = EnvironmentAdmin.query.join(Environment, EnvironmentAdmin.environment_id == Environment.id).join(Appointment, Environment.id == Appointment.environment_id).filter_by(**args).order_by(Appointment.id)
             if limit:
                 appointments = appointments.limit(limit)
 
