@@ -7,6 +7,7 @@ from app import db
 
 environment_fields = {
     'id': fields.Integer,
+    'name': fields.String,
     'location': fields.String,
     'capacity': fields.Integer,
     'type': fields.String,
