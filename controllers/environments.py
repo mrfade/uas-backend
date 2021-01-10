@@ -2,7 +2,6 @@ from flask_restful import Resource, reqparse, request
 from flask_restful import fields, marshal_with, marshal, inputs
 from models.environments import Environment
 from models.fixtures import Fixture
-from utils.jwt import authenticated
 from utils.dateformat import DateTimeFormat
 from app import db
 
@@ -31,7 +30,6 @@ environments_list_fields = {
 }
 
 class EnvironmentsResource(Resource):
-    method_decorators = [authenticated]
 
     def get(self, environment_id=None):
         if environment_id:
