@@ -98,4 +98,8 @@ class RegisterResource(Resource):
         db.session.add(user)
         db.session.commit()
 
-        return {'status': 'success', 'message': 'Register successfull'}
+        return {
+            'status': 'success',
+            'message': 'Register successfull',
+            'access_token': encode_jwt(user_id=user.id)
+        }
