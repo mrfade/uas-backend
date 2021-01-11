@@ -57,4 +57,3 @@ class EnvironmentsResource(Resource):
                 'count': len(environment),
                 'environments': [marshal(e, environment_fields) for e in environment]
             }, environments_list_fields)
-

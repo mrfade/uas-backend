@@ -71,4 +71,3 @@ class AdminFixturesResource(Resource):
         db.session.commit()
 
         return fixture
-

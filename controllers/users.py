@@ -13,6 +13,7 @@ user_fields = {
     'phone': fields.String,
 }
 
+
 class MeResource(Resource):
     method_decorators = [authenticated]
 

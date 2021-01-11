@@ -36,7 +36,7 @@ admin_appointment_post_parser.add_argument(
 class AdminAppointmentsResource(Resource):
     method_decorators = [adminAuthenticated]
 
-    def get(self, appointment_id=None, admin=None):   
+    def get(self, appointment_id=None, admin=None):
         if appointment_id:
             appointment = Appointment.query.filter_by(id=appointment_id).first_or_404()
             environment_admin = EnvironmentAdmin.query.filter_by(environment_id=appointment.environment_id,admin_id=admin.id).first_or_404()
@@ -56,7 +56,7 @@ class AdminAppointmentsResource(Resource):
             if offset:
                 appointments = appointments.offset(offset)
 
-            appointments = appointments.all()            
+            appointments = appointments.all()
 
             return marshal({
                 'count': len(appointments),
@@ -69,8 +69,8 @@ class AdminAppointmentApproveResource(Resource):
 
     def put(self, appointment_id=None, admin=None):
         appointment = Appointment.query.filter_by(id=appointment_id, admin_id=admin.id).first_or_404()
-        
+
         appointment.is_accepted = True
         db.session.commit()
-        
+
         return marshal(appointment, admin_appointment_fields)

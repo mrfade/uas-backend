@@ -47,4 +47,3 @@ class EnvironmentWorkingHour(db.Model):
 
     def __repr__(self):
         return 'Id: {}'.format(self.id)
-

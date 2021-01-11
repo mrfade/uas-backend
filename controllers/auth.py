@@ -12,24 +12,50 @@ register_fields = {
 }
 
 login_post_parser = reqparse.RequestParser()
+login_post_parser.add_argument('password',
+                               type=inputs.regex('^\w{6,16}$'),
+                               required=True,
+                               location=['json'],
+                               help='password parameter is required')
 login_post_parser.add_argument(
-    'password', type=inputs.regex('^\w{6,16}$'), required=True, location=['json'], help='password parameter is required')
-login_post_parser.add_argument(
-    'email', type=inputs.regex('^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'), required=True, location=['json'], help='email parameter is required')
+    'email',
+    type=inputs.regex('^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'),
+    required=True,
+    location=['json'],
+    help='email parameter is required')
 
 register_post_parser = reqparse.RequestParser()
+register_post_parser.add_argument('first_name',
+                                  type=inputs.regex('^\w{,20}$'),
+                                  required=True,
+                                  location=['json'],
+                                  help='first_name parameter is required')
+register_post_parser.add_argument('last_name',
+                                  type=inputs.regex('^\w{,20}$'),
+                                  required=True,
+                                  location=['json'],
+                                  help='last_name parameter is required')
+register_post_parser.add_argument('password',
+                                  type=inputs.regex('^\w{6,16}$'),
+                                  required=True,
+                                  location=['json'],
+                                  help='password parameter is required')
 register_post_parser.add_argument(
-    'first_name', type=inputs.regex('^\w{,20}$'), required=True, location=['json'], help='first_name parameter is required')
-register_post_parser.add_argument(
-    'last_name', type=inputs.regex('^\w{,20}$'), required=True, location=['json'], help='last_name parameter is required')
-register_post_parser.add_argument(
-    'password', type=inputs.regex('^\w{6,16}$'), required=True, location=['json'], help='password parameter is required')
-register_post_parser.add_argument(
-    'email', type=inputs.regex('^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'), required=True, location=['json'], help='email parameter is required')
-register_post_parser.add_argument(
-    'tc_number', type=inputs.regex('^[0-9]{11}$'), required=True, location=['json'], help='tc_number parameter is required')
-register_post_parser.add_argument(
-    'phone', type=inputs.regex('^[0-9]{10,20}$'), required=True, location=['json'], help='phone parameter is required')
+    'email',
+    type=inputs.regex('^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'),
+    required=True,
+    location=['json'],
+    help='email parameter is required')
+register_post_parser.add_argument('tc_number',
+                                  type=inputs.regex('^[0-9]{11}$'),
+                                  required=True,
+                                  location=['json'],
+                                  help='tc_number parameter is required')
+register_post_parser.add_argument('phone',
+                                  type=inputs.regex('^[0-9]{10,20}$'),
+                                  required=True,
+                                  location=['json'],
+                                  help='phone parameter is required')
 
 
 class LoginResource(Resource):
@@ -52,6 +78,7 @@ class LoginResource(Resource):
                 'message': 'User not found with provided credentials'
             }, 404
 
+
 class RegisterResource(Resource):
     @marshal_with(register_fields)
     def post(self):
@@ -71,7 +98,4 @@ class RegisterResource(Resource):
         db.session.add(user)
         db.session.commit()
 
-        return {
-            'status': 'success',
-            'message': 'Register successfull'
-        }
+        return {'status': 'success', 'message': 'Register successfull'}
