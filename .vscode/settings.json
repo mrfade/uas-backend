@@ -5,5 +5,5 @@
         "pylint_flask_sqlalchemy",
         "pylint_flask",
     ],
-    "python.formatting.provider": "none"
+    "python.formatting.provider": "yapf"
 }
